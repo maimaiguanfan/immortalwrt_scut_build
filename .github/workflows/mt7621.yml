@@ -6,7 +6,7 @@ name: mt7621_CI
 env:
   
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  REPO_BRANCH: openwrt-21.02
+  REPO_BRANCH: v21.02.7
 
 # Controls when the workflow will run
 on:
