@@ -19,8 +19,6 @@ wget https://raw.githubusercontent.com/wykdg/route_script/master/scut-unicom/Mak
 ./scripts/feeds install -a
 
 
-#在启动项加入联通加速
-sed -i '3i #如果使用联通加速，删除前面的#，并填充后面的值\n#sleep 10 && /usr/share/scut_unicom/add_route.sh server_ip username password' package/base-files/files/etc/rc.local 
 #将ttyd改成默认root登录
 sed -i "s/option command '\/bin\/login'/option command '\/bin\/login -f root'/" feeds/packages/utils/ttyd/files/ttyd.config 
 
