@@ -5,7 +5,7 @@ name: mt798x_CI
 
 env:
   
-  REPO_URL: https://github.com/hanwckf/immortalwrt-mt798x
+  REPO_URL: https://github.com/maimaiguanfan/immortalwrt-mt798x
   REPO_BRANCH: openwrt-21.02
 
 # Controls when the workflow will run
