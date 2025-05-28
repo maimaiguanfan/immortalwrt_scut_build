@@ -14,7 +14,7 @@ git clone https://github.com/kuoruan/openwrt-frp.git package/frp
 
 #单独拉取scutclient
 rm -rf feeds/luci/applications/luci-app-scutclient/
-git clone https://github.com/hanwckf/luci-app-scutclient.git feeds/luci/applications/luci-app-scutclient 
+git clone https://github.com/maimaiguanfan/luci-app-scutclient.git feeds/luci/applications/luci-app-scutclient 
 
 #单独拉取联通加速
 mkdir package/scut-unicom
