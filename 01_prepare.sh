@@ -12,6 +12,11 @@ cp -r ../nas-packages/network/services/ddnsto package/istore/
 cp -r ../nas-packages-luci/luci/luci-app-quickstart package/istore/
 cp -r ../nas-packages-luci/luci/luci-app-ddnsto package/istore/
 
+#拉取lucky
+rm -rf package/lucky/
+mkdir package/lucky/
+git clone https://github.com/gdy666/luci-app-lucky.git package/lucky/ --depth=1
+
 #拉取wake on lan plus
 git clone https://github.com/animegasan/luci-app-wolplus.git package/luci-app-wolplus --depth=1
 
