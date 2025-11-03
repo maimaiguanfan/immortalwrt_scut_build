@@ -21,8 +21,8 @@ git clone https://github.com/gdy666/luci-app-lucky.git package/lucky/ --depth=1
 git clone https://github.com/animegasan/luci-app-wolplus.git package/luci-app-wolplus --depth=1
 
 #单独拉取vernesong版OpenClash
- rm -rf feeds/luci/applications/luci-app-openclash/
- git clone https://github.com/vernesong/OpenClash.git feeds/luci/applications/luci-app-openclash --depth=1
+rm -rf feeds/luci/applications/luci-app-openclash/
+git clone https://github.com/vernesong/OpenClash.git feeds/luci/applications/luci-app-openclash --depth=1
 
 #单独拉取scutclient
 rm -rf feeds/luci/applications/luci-app-scutclient/
@@ -31,6 +31,11 @@ git clone https://github.com/maimaiguanfan/luci-app-scutclient.git feeds/luci/ap
 #单独拉取联通加速
 mkdir package/scut-unicom
 wget https://raw.githubusercontent.com/wykdg/route_script/master/scut-unicom/Makefile -O package/scut-unicom/Makefile
+
+#拉取easytier
+rm -rf package/luci-app-easytier
+mkdir package/luci-app-easytier
+git clone https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier --depth=1
 
 ./scripts/feeds install -a
 
