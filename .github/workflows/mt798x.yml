@@ -75,10 +75,10 @@ jobs:
           p7zip-full
       - name: Prepare
         run: |
-          build_date="$(date +%Y%m%d)"
-          image_prefix=immortalwrt-${build_variant}-scutclient
+          build_date="$(date +%Y%m%d%H%M)"
+          image_prefix=immortalwrt-${build_variant}
           echo "image_name=${image_prefix}-${build_date}" >> $GITHUB_ENV
-          echo "release_tag=immortalwrt-mt798x-scutclient-${build_date}">> $GITHUB_ENV
+          echo "release_tag=immortalwrt-mt798x-${build_date}">> $GITHUB_ENV
 
 
           git clone --depth=1 -b $REPO_BRANCH $REPO_URL openwrt

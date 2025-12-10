@@ -1,12 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: mt7621_CI
+name: mt7981-6.6_CI
 
 
 env:
   
-  REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  REPO_BRANCH: openwrt-21.02
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6
+  REPO_BRANCH: openwrt-24.10-6.6
 
 # Controls when the workflow will run
 on:
@@ -18,6 +18,22 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      enable_package_conf:
+        description: '添加 package.conf (openclash, ttyd, ramfree, uhttpd, easytier)'
+        required: false
+        type: boolean
+        default: true
+      enable_scutpkg_conf:
+        description: '添加 scutpkg.conf (socat, scutclient, xl2tpd, scut-unicom)'
+        required: false
+        type: boolean
+        default: false
+      enable_istorepkg_conf:
+        description: '添加 istorepkg.conf (ddnsto, store, quickstart)'
+        required: false
+        type: boolean
+        default: false
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -30,20 +46,13 @@ jobs:
     env:
       build_variant: ${{ matrix.build_variant }}
       platform: ${{ matrix.platform }}
-      type: ${{ matrix.type }}
+      
 
     strategy:
       matrix:
         include:
-          - build_variant: mt7621-mini
-            platform: mt7621
-            type: mini
-
-          - build_variant: mt7621-full
-            platform: mt7621
-            type: full
-
-
+          - build_variant: mt7981-ax3000
+            platform: mt7981
 
         
     if: github.event.repository.owner.id == github.event.sender.id
@@ -76,20 +85,31 @@ jobs:
           build_date="$(date +%Y%m%d%H%M)"
           image_prefix=immortalwrt-${build_variant}
           echo "image_name=${image_prefix}-${build_date}" >> $GITHUB_ENV
-          echo "release_tag=immortalwrt-mt7621-${build_date}">> $GITHUB_ENV
+          echo "release_tag=immortalwrt-mt7981-6.6-${build_date}">> $GITHUB_ENV
 
 
           git clone --depth=1 -b $REPO_BRANCH $REPO_URL openwrt
-          
+
           cd openwrt
+          
           bash ../01_prepare.sh 
 
-          #产生config文件，编译所有7621机器
-          cat ../mt7621_config.seed>.config
-          if [ "$type" == "full" ]; then
-            bash ../02_add_package.sh
+          #产生config文件
+          cat defconfig/${build_variant}.config >.config
+
+          # 根据选择添加额外的 package
+          if [ "${{ github.event.inputs.enable_package_conf }}" == "true" ] || [ -z "${{ github.event.inputs.enable_package_conf }}" ]; then
+            echo "Adding packages from package.conf..."
+            bash ../02_add_package.sh package.conf
           fi
-          
+          if [ "${{ github.event.inputs.enable_scutpkg_conf }}" == "true" ]; then
+            echo "Adding packages from scutpkg.conf..."
+            bash ../02_add_package.sh scutpkg.conf
+          fi
+          if [ "${{ github.event.inputs.enable_istorepkg_conf }}" == "true" ]; then
+            echo "Adding packages from istorepkg.conf..."
+            bash ../02_add_package.sh istorepkg.conf
+          fi
           make defconfig
 
       - name: Make Download
@@ -108,14 +128,8 @@ jobs:
         run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          
-          
-          if [ "$type" == "full" ]; then
-            mv openwrt/bin/targets/ramips/${platform}/immortalwrt*sysupgrade* ./artifact/
-          else
-            mv openwrt/bin/targets/ramips/${platform}/immortalwrt* ./artifact/
-          fi
-          
+
+          mv openwrt/bin/targets/mediatek/${{env.platform}}/immortalwrt-*squashfs* ./artifact/
           cd artifact
           7z a -mx=9 ../${{ env.image_name }}.7z .
 
