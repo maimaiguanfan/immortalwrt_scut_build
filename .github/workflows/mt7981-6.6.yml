@@ -20,17 +20,17 @@ on:
   workflow_dispatch:
     inputs:
       enable_package_conf:
-        description: '添加 package.conf (openclash, ttyd, ramfree, uhttpd, easytier)'
+        description: 'Add package.conf (openclash, ttyd, ramfree, uhttpd, easytier)'
         required: false
         type: boolean
         default: true
       enable_scutpkg_conf:
-        description: '添加 scutpkg.conf (socat, scutclient, xl2tpd, scut-unicom)'
+        description: 'Add scutpkg.conf (socat, scutclient, xl2tpd, scut-unicom)'
         required: false
         type: boolean
         default: false
       enable_istorepkg_conf:
-        description: '添加 istorepkg.conf (ddnsto, store, quickstart)'
+        description: 'Add istorepkg.conf (ddnsto, store, quickstart)'
         required: false
         type: boolean
         default: false
@@ -79,7 +79,8 @@ jobs:
           sudo apt install -y build-essential clang flex bison g++ gawk \
           gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
           python3-distutils python3-setuptools rsync swig unzip zlib1g-dev file wget \
-          p7zip-full
+          p7zip-full \
+          libfuse-dev
       - name: Prepare
         run: |
           build_date="$(date +%Y%m%d%H%M)"
@@ -94,10 +95,11 @@ jobs:
           
           bash ../01_prepare.sh 
 
-          #产生config文件
+          rm -rf feeds/packages/lang/golang
+          git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
+
           cat defconfig/${build_variant}.config >.config
 
-          # 根据选择添加额外的 package
           if [ "${{ github.event.inputs.enable_package_conf }}" == "true" ] || [ -z "${{ github.event.inputs.enable_package_conf }}" ]; then
             echo "Adding packages from package.conf..."
             bash ../02_add_package.sh package.conf
@@ -124,12 +126,21 @@ jobs:
           cd openwrt
           make -j$(nproc) || make -j1 V=s
 
+      - name: Delete unnecessary files
+        run: |
+          cd openwrt/bin/targets/mediatek/${{env.platform}}
+          rm -rf packages
+          rm -rf *.buildinfo
+          rm -rf *.manifest
+          rm -rf *.json
+          rm -rf *bl2.bin
+
       - name: Package
         run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
 
-          mv openwrt/bin/targets/mediatek/${{env.platform}}/immortalwrt-*squashfs* ./artifact/
+          mv openwrt/bin/targets/mediatek/${{env.platform}}/* ./artifact/
           cd artifact
           7z a -mx=9 ../${{ env.image_name }}.7z .
 
